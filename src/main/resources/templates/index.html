@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tsinjo - Fonds d'urgence HEI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: #5a67d8;
+        }
+
+        .transactions-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .transaction {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .transaction-type {
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            color: white;
+        }
+
+        .transaction-type.DON {
+            background-color: #48bb78;
+        }
+
+        .transaction-type.AIDE {
+            background-color: #ed8936;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .transaction-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status.SUCCEEDED {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status.VERIFYING {
+            background-color: #fef5e7;
+            color: #c05621;
+        }
+
+        .status.FAILED {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Tsinjo - Fonds d'urgence HEI</h1>
+    <p>Solidarité et transparence pour notre communauté</p>
+</div>
+
+<div class="form-container">
+    <h2>Faire un don</h2>
+    <form th:action="@{/donations}" th:object="${donationForm}" method="post">
+        <div class="form-group">
+            <label for="donorEmail">Votre email</label>
+            <input type="email" id="donorEmail" th:field="*{donorEmail}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="donorFullName">Votre nom complet</label>
+            <input type="text" id="donorFullName" th:field="*{donorFullName}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Montant (€)</label>
+            <input type="number" id="amount" th:field="*{amount}" min="1" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="paymentMethod">Moyen de paiement</label>
+            <select id="paymentMethod" th:field="*{paymentMethod}" required>
+                <option value="">Sélectionnez un moyen de paiement</option>
+                <option value="Mobile Money">Mobile Money</option>
+                <option value="Carte bancaire">Carte bancaire</option>
+                <option value="Virement">Virement</option>
+                <option value="Espèces">Espèces</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="paymentId">ID de paiement (fourni par l'examen)</label>
+            <input type="text" id="paymentId" th:field="*{paymentId}" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Soumettre le don</button>
+    </form>
+</div>
+
+<div class="transactions-container">
+    <h2>Historique des transactions</h2>
+
+    <div th:if="${#lists.isEmpty(transactions)}">
+        <p>Aucune transaction pour le moment.</p>
+    </div>
+
+    <div th:each="transaction : ${transactions}" class="transaction">
+        <div class="transaction-header">
+            <div>
+                <span class="transaction-type" th:class="'transaction-type ' + ${transaction.type}" th:text="${transaction.type}"></span>
+                <span class="transaction-amount" th:text="${transaction.amount} + ' €'"></span>
+            </div>
+            <div>
+                <span class="status" th:class="'status ' + ${transaction.status}" th:text="${transaction.status}"></span>
+            </div>
+        </div>
+
+        <div class="transaction-details">
+            <strong th:text="${transaction.personName}"></strong>
+            (<span th:text="${transaction.personEmail}"></span>)
+            <br>
+            <span th:text="'Moyen: ' + ${transaction.paymentMethod}"></span> |
+            <span th:text="'Date: ' + ${#temporals.format(transaction.date, 'dd/MM/yyyy HH:mm')}"></span>
+
+            <div th:if="${transaction.description != null}" style="margin-top: 0.5rem; font-style: italic;">
+                <strong>Description de l'accident:</strong>
+                <span th:text="${transaction.description}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
