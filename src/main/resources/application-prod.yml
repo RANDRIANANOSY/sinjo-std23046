@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:tsinjo_prod}
+    username: ${DB_USERNAME:tsinjo}
+    password: ${DB_PASSWORD:tsinjo}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+vola:
+  api:
+    base-url: ${VOLA_API_BASE_URL:https://api.vola.mg}
+    key: 13e46640-889f-4d59-b45b-62f4e9dd3830
