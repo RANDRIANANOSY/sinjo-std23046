@@ -13,5 +13,5 @@ spring:
     baseline-on-migrate: true
 vola:
   api:
-    base-url: ${VOLA_API_BASE_URL:https://api.vola.mg}
+    base-url: https://tb5rnkxhmpeui22aebnvpchlky0kzffi.lambda-url.eu-west-3.on.aws/
     key: 13e46640-889f-4d59-b45b-62f4e9dd3830
